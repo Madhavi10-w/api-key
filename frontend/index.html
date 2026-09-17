@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My AI Assistant</title>
+</head>
+
+<body>
+
+    <h1>My AI Assistant</h1>
+
+    <input type="text" id="question" placeholder="Ask something...">
+
+    <button onclick="askAI()">Send</button>
+
+    <p id="response"></p>
+
+    <script>
+        async function askAI() {
+
+            const question = document.getElementById("question").value;
+
+            // Check if the user entered something
+            if (question.trim() === "") {
+                document.getElementById("response").innerText =
+                    "Please enter a question.";
+                return;
+            }
+
+            // Show loading message
+            document.getElementById("response").innerText =
+                "Thinking...";
+
+            try {
+
+                // Send question to backend
+                const response = await fetch("http://localhost:3000/ask", {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        question: question
+                    })
+                });
+
+                // Convert response to JSON
+                const data = await response.json();
+
+                // If AI successfully answered
+                if (data.answer) {
+
+                    document.getElementById("response").innerText =
+                        data.answer;
+
+                }
+
+                // If backend returned an error
+                else if (data.error) {
+
+                    document.getElementById("response").innerText =
+                        "Error: " + data.error;
+
+                }
+
+                // Unexpected response
+                else {
+
+                    document.getElementById("response").innerText =
+                        "Something went wrong.";
+
+                }
+
+            } catch (error) {
+
+                // Error connecting to backend
+                console.error(error);
+
+                document.getElementById("response").innerText =
+                    "Could not connect to the server.";
+
+            }
+
+        }
+    </script>
+
+</body>
+
+</html>
